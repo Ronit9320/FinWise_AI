@@ -55,7 +55,7 @@ cron.schedule("0 9 * * *", async () => {
       const info = await transporter.sendMail({
         from: process.env.FROM_EMAIL,
         to: user.email,
-        subject: "RetireWise – Monthly retirement check-in",
+        subject: "FinWise – Monthly financial check-in",
         text: `Hi ${user.name || "there"},
 
 It's the 1st of the month – time to review your retirement plan.
@@ -66,9 +66,9 @@ Quick checklist:
 3. Any big expenses coming up (education, travel, medical)?
 4. Do you need to adjust your savings or risk level?
 
-Log in to your RetireWise AI chatbot and run Advanced mode for a fresh estimate.
+Log in to your FinWise AI chatbot and run Advanced mode for a fresh estimate.
 
-– RetireWise AI`,
+– FinWise AI`,
       });
 
       console.log(`Reminder sent to ${user.email}: ${info.messageId}`);

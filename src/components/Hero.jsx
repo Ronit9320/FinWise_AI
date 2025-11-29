@@ -13,12 +13,12 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Agentic AI for{" "}
-            <span className="text-primary">Indian Retirement Planning</span>.
+             Agentic AI for{" "}
+             <span className="text-primary">Indian Financial Planning</span>.
           </motion.h1>
 
           <p className="text-slate-300 text-sm sm:text-base max-w-xl">
-            RetireWise AI acts as your personal retirement analyst and reminder
+             FinWise AI acts as your personal financial analyst and reminder
             assistant. Chat in{" "}
             <span className="font-medium text-slate-100">Basic</span> or{" "}
             <span className="font-medium text-slate-100">Advanced</span> mode
@@ -56,7 +56,7 @@ const Hero = () => {
           transition={{ duration: 0.7, delay: 0.1 }}
         >
           <div className="flex justify-between items-center text-xs text-slate-400 mb-1">
-            <span>RetireWise – Live session</span>
+            <span>FinWise – Live session</span>
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-emerald-400" /> Online
             </span>

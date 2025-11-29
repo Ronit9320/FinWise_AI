@@ -8,7 +8,7 @@ const Navbar = () => {
           <div className="h-8 w-8 rounded-xl bg-primary/80 flex items-center justify-center text-xs font-bold">
             RW
           </div>
-          <span className="font-semibold tracking-tight">RetireWise AI</span>
+           <span className="font-semibold tracking-tight">FinWise AI</span>
         </div>
          <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
            <a href="#modes" className="hover:text-slate-50">Modes</a>

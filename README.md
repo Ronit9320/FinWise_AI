@@ -1,14 +1,14 @@
-# RetireWise AI
+# FinWise AI
 
-An agentic AI-powered retirement planning platform built for Indian users during Mumbai Hacks hackathon. RetireWise AI acts as your personal retirement analyst and reminder assistant, providing tailored financial advice based on Indian incomes, expenses, and inflation rates.
+An agentic AI-powered financial planning platform built for Indian users during Mumbai Hacks hackathon. FinWise AI acts as your personal financial analyst and reminder assistant, providing tailored financial advice based on Indian incomes, expenses, and inflation rates.
 
 ## Features
 
 - **Agentic AI Chat Interface**: Interactive conversations with AI for personalized retirement planning
 - **Basic & Advanced Modes**: Choose between simple guidance or comprehensive financial analysis
 - **Indian Market Focus**: Calculations tuned for Indian tax structures, cost of living, and inflation
-- **Goal-Based Planning**: Set retirement goals and get clear savings targets and investment recommendations
-- **Automated Reminders**: Monthly reminders to stay on track with your retirement goals
+- **Goal-Based Planning**: Set financial goals and get clear savings targets and investment recommendations
+- **Automated Reminders**: Monthly reminders to stay on track with your financial goals
 - **Risk Assessment**: Personalized risk profiling and investment style recommendations
 
 ## Tech Stack
