@@ -16,12 +16,17 @@ const Navbar = () => {
           <a href="#calculator" className="hover:text-slate-50">Calculator</a>
 
         </div>
-        <button
-          onClick={() => window.botpressWebChat && window.botpressWebChat.sendEvent({ type: "show" })}
-          className="px-4 py-2 rounded-full bg-primary hover:bg-indigo-500 text-sm font-medium"
-        >
-          Chat with AI
-        </button>
+         <button
+           onClick={() => {
+             // Since we're using React component, we can handle toggle via state if needed
+             // For now, this button can be removed or repurposed
+             // If you want global toggle, consider using context
+             alert('Chat feature is available via the floating button');
+           }}
+           className="px-4 py-2 rounded-full bg-primary hover:bg-indigo-500 text-sm font-medium"
+         >
+           Chat with AI
+         </button>
       </nav>
     </header>
   );
