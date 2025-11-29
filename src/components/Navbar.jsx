@@ -14,7 +14,7 @@ const Navbar = () => {
           <a href="#modes" className="hover:text-slate-50">Modes</a>
           <a href="#features" className="hover:text-slate-50">Features</a>
           <a href="#calculator" className="hover:text-slate-50">Calculator</a>
-          <a href="#reminders" className="hover:text-slate-50">Reminders</a>
+
         </div>
         <button
           onClick={() => window.botpressWebChat && window.botpressWebChat.sendEvent({ type: "show" })}
