@@ -65,7 +65,7 @@ const CalculatorSection = () => {
   return (
     <section id="calculator" className="py-12 border-t border-slate-800/60">
       <h2 className="text-xl sm:text-2xl font-semibold mb-2">
-        Retirement calculator (Angel One style)
+        Retirement calculator
       </h2>
       <p className="text-slate-300 text-sm mb-6 max-w-2xl">
         Enter your age, retirement goals and expenses to estimate the retirement
