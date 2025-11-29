@@ -1,239 +1,172 @@
-// retirementCalculator.js
-// All inputs in INR, rates as decimals (e.g. 0.12 = 12%)
+// Retirement calculator utilities
+// Modelled similar to Angel One's retirement calculator:
+// - Inputs: current age, retirement age, life expectancy,
+//           monthly expenses today, inflation, expected returns,
+//           existing savings, monthly investments.
+// - Outputs: corpus required, estimated corpus, gap, required monthly SIP.
 
-/**
- * Calculate future value of monthly investments (SIP)
- */
-export function futureValue(monthlyInvestment, annualReturn, years) {
-  if (monthlyInvestment < 0 || years < 0) return 0;
+const MONTHS_IN_YEAR = 12;
 
-  const r = annualReturn / 12;
-  const n = years * 12;
+/** Future value of a lump sum: FV = PV * (1 + r)^n */
+export function futureValueLumpsum(presentValue, annualReturn, years) {
+  if (years <= 0) return presentValue || 0;
+  const r = annualReturn;
+  return (presentValue || 0) * Math.pow(1 + r, years);
+}
 
-  // Handle zero or near-zero returns
-  if (Math.abs(r) < 1e-10) {
-    return monthlyInvestment * n;
-  }
+/** Future value of a monthly SIP: FV = P * ((1+r)^n - 1) / r */
+export function futureValueSIP(monthlyInvestment, annualReturn, years) {
+  const P = monthlyInvestment || 0;
+  const r = annualReturn / MONTHS_IN_YEAR;
+  const n = years * MONTHS_IN_YEAR;
 
-  // Future value of annuity formula (ordinary annuity)
-  return monthlyInvestment * ((Math.pow(1 + r, n) - 1) / r);
+  if (n <= 0) return 0;
+  if (Math.abs(r) < 1e-10) return P * n;
+
+  return P * ((Math.pow(1 + r, n) - 1) / r);
+}
+
+/** Adjust amount for inflation over given years. */
+export function inflationAdjustedAmount(amountToday, inflationRate, years) {
+  if (years <= 0) return amountToday || 0;
+  return (amountToday || 0) * Math.pow(1 + inflationRate, years);
+}
+
+/** Nominal -> real rate: (1+nominal)/(1+inflation) - 1 */
+export function nominalToRealRate(nominalReturn, inflationRate) {
+  return (1 + nominalReturn) / (1 + inflationRate) - 1;
 }
 
 /**
- * Adjust amount for inflation
+ * Given a target corpus and time to retirement,
+ * compute required monthly SIP to reach that corpus.
+ *
+ * targetCorpus   – corpus needed at retirement
+ * existingCorpus – lump-sum already saved
+ * annualReturn   – pre-retirement return (nominal)
+ * yearsToRetire
  */
-export function inflationAdjustedAmount(amountToday, inflation, years) {
-  if (amountToday < 0 || years < 0) return 0;
-  return amountToday * Math.pow(1 + inflation, years);
-}
-
-/**
- * Estimate required corpus for retirement with inflation during retirement.
- * - targetMonthlyToday: target monthly income in today's rupees
- * - inflation: expected inflation till retirement (e.g. 0.06)
- * - inflationDuringRetirement: expected inflation during retirement (e.g. 0.06)
- * - postRetReturn: expected annual return during retirement (e.g. 0.08)
- * - yearsToRetire
- * - yearsInRetirement (e.g. 25–30)
- */
-export function calculateRequiredCorpus({
-  targetMonthlyToday,
-  inflation = 0.06,
-  inflationDuringRetirement = 0.06,
-  postRetReturn = 0.08,
-  yearsToRetire,
-  yearsInRetirement = 25,
-}) {
-  // Validate inputs
-  if (targetMonthlyToday <= 0 || yearsToRetire < 0 || yearsInRetirement <= 0) {
-    throw new Error("Invalid input parameters");
-  }
-
-  // Calculate monthly expense at retirement (Year 0 of retirement)
-  const monthlyAtRetirement = inflationAdjustedAmount(
-    targetMonthlyToday,
-    inflation,
-    yearsToRetire,
-  );
-
-  const yearlyAtRetirement = monthlyAtRetirement * 12;
-  const r = postRetReturn;
-  const g = inflationDuringRetirement;
-  const n = yearsInRetirement;
-
-  let requiredCorpus;
-
-  // Check if return equals inflation (special case)
-  if (Math.abs(r - g) < 0.0001) {
-    // If return equals inflation, we need sum of all yearly expenses
-    requiredCorpus = yearlyAtRetirement * n;
-  } else if (r < g) {
-    // If inflation exceeds returns, corpus will deplete faster
-    // Still calculate but this is not sustainable long-term
-    requiredCorpus =
-      yearlyAtRetirement * ((1 - Math.pow((1 + g) / (1 + r), n)) / (r - g));
-  } else {
-    // Growing annuity formula (standard case)
-    // PV = PMT × [(1 - ((1+g)/(1+r))^n) / (r - g)]
-    requiredCorpus =
-      yearlyAtRetirement * ((1 - Math.pow((1 + g) / (1 + r), n)) / (r - g));
-  }
-
-  return {
-    monthlyAtRetirement: Math.round(monthlyAtRetirement),
-    requiredCorpus: Math.round(requiredCorpus),
-  };
-}
-
-/**
- * Estimate future corpus based on:
- * - current corpus (lumpsum)
- * - monthly investment
- * - annual return
- */
-export function estimateFutureCorpus({
-  currentCorpus = 0,
-  monthlyInvestment,
-  annualReturn = 0.12,
+export function requiredMonthlySIP({
+  targetCorpus,
+  existingCorpus = 0,
+  annualReturn,
   yearsToRetire,
 }) {
-  if (monthlyInvestment < 0 || yearsToRetire < 0) {
-    throw new Error("Invalid input parameters");
-  }
+  const n = yearsToRetire * MONTHS_IN_YEAR;
+  if (n <= 0 || !isFinite(n)) return 0;
 
-  const fvContributions = futureValue(
-    monthlyInvestment,
+  const r = annualReturn / MONTHS_IN_YEAR;
+
+  const fvExisting = futureValueLumpsum(
+    existingCorpus,
     annualReturn,
     yearsToRetire,
   );
-  const fvCurrent = currentCorpus * Math.pow(1 + annualReturn, yearsToRetire);
-  return Math.round(fvContributions + fvCurrent);
+
+  const neededFromSIP = Math.max(targetCorpus - fvExisting, 0);
+
+  if (neededFromSIP <= 0) return 0;
+
+  if (Math.abs(r) < 1e-10) {
+    // No growth -> just divide across months
+    return neededFromSIP / n;
+  }
+
+  // From FV annuity formula: FV = P * ((1+r)^n - 1) / r
+  // => P = FV * r / ((1+r)^n - 1)
+  const monthly = (neededFromSIP * r) / (Math.pow(1 + r, n) - 1);
+  return monthly;
 }
 
 /**
- * Suggest a risk profile based on:
- * - age
- * - yearsToRetire
- * - riskComfort: 'low' | 'medium' | 'high'
+ * MAIN function:
+ * Compute a full retirement plan in an Angel One–style approach.
+ *
+ * Inputs (all numbers):
+ * - currentAge
+ * - retirementAge
+ * - lifeExpectancy
+ * - monthlyExpenseToday         (₹, today's cost of living)
+ * - inflationRate               (decimal, e.g. 0.06 = 6%)
+ * - existingCorpus              (₹ already saved for retirement)
+ * - monthlyInvestment           (current monthly retirement saving, optional)
+ * - preRetReturn                (decimal, e.g. 0.10 = 10%)
+ * - postRetReturn               (decimal, e.g. 0.06 = 6%)
  */
-export function suggestRiskProfile({ age, yearsToRetire, riskComfort }) {
-  if (age && age < 18) {
-    throw new Error("Invalid age");
-  }
-  if (yearsToRetire < 0) {
-    throw new Error("Invalid years to retire");
-  }
-
-  const comfort = (riskComfort || "medium").toLowerCase();
-
-  if (comfort === "high" && yearsToRetire >= 20) {
-    return {
-      label: "Aggressive",
-      equity: 0.75,
-      debt: 0.2,
-      others: 0.05,
-      description:
-        "Higher equity allocation via diversified equity mutual funds, index funds and small exposure to mid/small-cap funds.",
-    };
-  }
-  if (comfort === "low" || yearsToRetire <= 10) {
-    return {
-      label: "Conservative",
-      equity: 0.35,
-      debt: 0.55,
-      others: 0.1,
-      description:
-        "Focus on safer options like high-quality debt funds, FDs, PPF, NPS with limited equity exposure.",
-    };
-  }
-  return {
-    label: "Balanced",
-    equity: 0.55,
-    debt: 0.4,
-    others: 0.05,
-    description:
-      "Blend of equity mutual funds / index funds with good allocation to debt funds, PPF, EPF and NPS.",
-  };
-}
-
-/**
- * Simple monthly budget suggestion.
- */
-export function buildBudget({ netIncome, targetSavingsRatio = 0.3 }) {
-  if (netIncome <= 0) {
-    throw new Error("Net income must be positive");
-  }
-
-  if (targetSavingsRatio < 0 || targetSavingsRatio > 1) {
-    throw new Error("Savings ratio must be between 0 and 1");
-  }
-
-  const invest = Math.round(netIncome * targetSavingsRatio);
-  const needs = Math.round(netIncome * 0.5);
-  const wants = netIncome - invest - needs;
-
-  return {
-    invest,
-    needs,
-    wants: Math.round(wants),
-  };
-}
-
-/**
- * Simulate retirement year by year to verify corpus sustainability
- * @param {Object} params - Simulation parameters
- * @param {number} params.startingCorpus - Initial retirement corpus
- * @param {number} params.monthlyExpenseAtRetirement - Monthly expense at start of retirement
- * @param {number} params.inflationDuringRetirement - Annual inflation rate during retirement
- * @param {number} params.postRetReturn - Annual return rate during retirement
- * @param {number} params.yearsInRetirement - Number of years in retirement
- * @returns {Object} Simulation results with success status and year details
- */
-export function simulateRetirement({
-  startingCorpus,
-  monthlyExpenseAtRetirement,
-  inflationDuringRetirement = 0.06,
-  postRetReturn = 0.08,
-  yearsInRetirement = 25,
+export function computeRetirementPlan({
+  currentAge,
+  retirementAge,
+  lifeExpectancy,
+  monthlyExpenseToday,
+  inflationRate = 0.06,
+  existingCorpus = 0,
+  monthlyInvestment = 0,
+  preRetReturn = 0.1,
+  postRetReturn = 0.06,
 }) {
-  let corpus = startingCorpus;
-  let currentYearlyExpense = monthlyExpenseAtRetirement * 12;
-  const yearDetails = [];
+  const yearsToRetire = Math.max((retirementAge || 0) - (currentAge || 0), 0);
+  const yearsInRetirement = Math.max(
+    (lifeExpectancy || 0) - (retirementAge || 0),
+    0,
+  );
 
-  for (let year = 1; year <= yearsInRetirement; year++) {
-    const startCorpus = corpus;
+  // 1) Monthly expense at retirement (inflation-adjusted)
+  const monthlyAtRetirement = inflationAdjustedAmount(
+    monthlyExpenseToday || 0,
+    inflationRate,
+    yearsToRetire,
+  );
+  const annualAtRetirement = monthlyAtRetirement * MONTHS_IN_YEAR;
 
-    // Earn returns on corpus at beginning of year
-    const returns = corpus * postRetReturn;
-    corpus += returns;
+  // 2) Required corpus at retirement using real return
+  // Real return during retirement (after inflation)
+  const realAnnualPost = nominalToRealRate(postRetReturn, inflationRate);
+  const realMonthlyPost = realAnnualPost / MONTHS_IN_YEAR;
+  const n = yearsInRetirement * MONTHS_IN_YEAR;
 
-    // Withdraw yearly expense
-    corpus -= currentYearlyExpense;
+  let requiredCorpus;
 
-    yearDetails.push({
-      year,
-      startCorpus: Math.round(startCorpus),
-      returns: Math.round(returns),
-      withdrawal: Math.round(currentYearlyExpense),
-      endCorpus: Math.round(corpus),
-    });
-
-    if (corpus < 0) {
-      return {
-        success: false,
-        yearsFailed: year,
-        yearDetails,
-        remainingCorpus: Math.round(corpus),
-      };
-    }
-
-    // Increase expense for next year due to inflation
-    currentYearlyExpense *= 1 + inflationDuringRetirement;
+  if (n <= 0) {
+    requiredCorpus = 0;
+  } else if (Math.abs(realMonthlyPost) < 1e-6) {
+    // Approx zero real return => corpus ≈ monthly * months
+    requiredCorpus = monthlyAtRetirement * n;
+  } else {
+    // PV of an inflation-adjusted annuity (using real rate)
+    requiredCorpus =
+      monthlyAtRetirement *
+      ((1 - Math.pow(1 + realMonthlyPost, -n)) / realMonthlyPost);
   }
 
+  // 3) Estimated corpus from current plan:
+  //    existing lump sum + monthly SIP till retirement
+  const fvExisting = futureValueLumpsum(
+    existingCorpus,
+    preRetReturn,
+    yearsToRetire,
+  );
+  const fvSIP = futureValueSIP(monthlyInvestment, preRetReturn, yearsToRetire);
+  const estimatedCorpus = fvExisting + fvSIP;
+
+  // 4) Gap (positive = shortfall)
+  const corpusGap = requiredCorpus - estimatedCorpus;
+
+  // 5) Required monthly SIP to reach target (Angel One-style output)
+  const requiredMonthlyInvestment = requiredMonthlySIP({
+    targetCorpus: requiredCorpus,
+    existingCorpus,
+    annualReturn: preRetReturn,
+    yearsToRetire,
+  });
+
   return {
-    success: true,
-    remainingCorpus: Math.round(corpus),
-    yearDetails,
+    yearsToRetire,
+    yearsInRetirement,
+    monthlyAtRetirement,
+    annualAtRetirement,
+    requiredCorpus,
+    estimatedCorpus,
+    corpusGap,
+    requiredMonthlyInvestment,
   };
 }
