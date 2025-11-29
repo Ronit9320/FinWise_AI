@@ -1,16 +1,60 @@
-# React + Vite
+# RetireWise AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An agentic AI-powered retirement planning platform built for Indian users during Mumbai Hacks hackathon. RetireWise AI acts as your personal retirement analyst and reminder assistant, providing tailored financial advice based on Indian incomes, expenses, and inflation rates.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Agentic AI Chat Interface**: Interactive conversations with AI for personalized retirement planning
+- **Basic & Advanced Modes**: Choose between simple guidance or comprehensive financial analysis
+- **Indian Market Focus**: Calculations tuned for Indian tax structures, cost of living, and inflation
+- **Goal-Based Planning**: Set retirement goals and get clear savings targets and investment recommendations
+- **Automated Reminders**: Monthly reminders to stay on track with your retirement goals
+- **Risk Assessment**: Personalized risk profiling and investment style recommendations
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 19 with Vite
+- **Styling**: Tailwind CSS with custom gradients
+- **Animations**: Framer Motion
+- **Charts**: Recharts for data visualization
+- **AI Integration**: Botpress Web Chat for conversational AI
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+## Build for Production
+
+```bash
+npm run build
+```
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── BotpressChat.jsx      # AI chat integration
+│   ├── CalculatorSection.jsx # Retirement calculator UI
+│   ├── Features.jsx          # Feature showcase
+│   ├── Footer.jsx            # Site footer
+│   ├── Hero.jsx              # Landing section
+│   ├── ModesSection.jsx      # Basic/Advanced mode selection
+│   └── Navbar.jsx            # Navigation header
+├── utils/
+│   └── retirementCalculator.js # Calculation logic
+└── App.jsx                   # Main application component
+```
+
+## Mumbai Hacks
+
+This project was developed during Mumbai Hacks hackathon to address the growing need for accessible retirement planning tools in India.
