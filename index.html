@@ -3,6 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <title>RetireWise AI</title>
+  <!-- Botpress Webchat CDN -->
+  <script src="https://cdn.botpress.cloud/webchat/v2/inject.js"></script>
+  <script>
+    window.botpressWebChat.init({
+      "composerPlaceholder": "Type your message...",
+      "botConversationDescription": "Your AI retirement planning assistant",
+      "botId": "YOUR_BOT_ID_HERE", // Replace with your actual bot ID from Dashboard
+      "hostUrl": "https://cdn.botpress.cloud/webchat/v2",
+      "messagingUrl": "https://messaging.botpress.cloud",
+      "clientId": "8e3bc69f-74ff-42d7-9874-8678354aeeca",
+      "webhookId": "YOUR_WEBHOOK_ID_HERE", // Replace with your actual webhook ID
+      "lazySocket": true,
+      "themeName": "prism",
+      "botName": "RetireWise AI",
+      "avatarUrl": "https://via.placeholder.com/40x40?text=AI", // Optional bot avatar
+      "frontendVersion": "v2",
+      "useSessionStorage": true,
+      "enableConversationDeletion": true,
+      "theme": "prism",
+      "themeColor": "#2563eb",
+      "showPoweredBy": false
+    });
+  </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body class="gradient-bg">

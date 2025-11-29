@@ -6,7 +6,7 @@ import Features from "./components/Features";
 import CalculatorSection from "./components/CalculatorSection";
 
 import Footer from "./components/Footer";
-import BotpressChat from "./components/BotpressChat";
+
 
 function App() {
   return (
@@ -20,10 +20,7 @@ function App() {
 
       </main>
 
-      {/* Botpress widget lives globally */}
-      <BotpressChat />
-
-      <Footer />
+       <Footer />
     </div>
   );
 }

@@ -18,10 +18,9 @@ const Navbar = () => {
         </div>
          <button
            onClick={() => {
-             // Since we're using React component, we can handle toggle via state if needed
-             // For now, this button can be removed or repurposed
-             // If you want global toggle, consider using context
-             alert('Chat feature is available via the floating button');
+             if (window.botpressWebChat) {
+               window.botpressWebChat.sendEvent({ type: "toggle" });
+             }
            }}
            className="px-4 py-2 rounded-full bg-primary hover:bg-indigo-500 text-sm font-medium"
          >
