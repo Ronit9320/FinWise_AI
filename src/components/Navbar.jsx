@@ -10,22 +10,11 @@ const Navbar = () => {
           </div>
           <span className="font-semibold tracking-tight">RetireWise AI</span>
         </div>
-        <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
-          <a href="#modes" className="hover:text-slate-50">Modes</a>
-          <a href="#features" className="hover:text-slate-50">Features</a>
-          <a href="#calculator" className="hover:text-slate-50">Calculator</a>
-
-        </div>
-         <button
-           onClick={() => {
-             if (window.botpressWebChat) {
-               window.botpressWebChat.sendEvent({ type: "toggle" });
-             }
-           }}
-           className="px-4 py-2 rounded-full bg-primary hover:bg-indigo-500 text-sm font-medium"
-         >
-           Chat with AI
-         </button>
+         <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
+           <a href="#modes" className="hover:text-slate-50">Modes</a>
+           <a href="#features" className="hover:text-slate-50">Features</a>
+           <a href="#calculator" className="hover:text-slate-50">Calculator</a>
+         </div>
       </nav>
     </header>
   );
